@@ -6,15 +6,10 @@
  */
 
 #include "tft_ili9341/stm32f1_ili9341.h"
+#include "gestion_affichage.h"
 #include "jeu_base.h"
 
-#define max(a, b) ((a > b) ? a : b)
-#define min(a, b) ((a < b) ? a : b)
-
 uint16_t BGC1=ILI9341_COLOR_BLACK;
-
-uint16_t DIMX=320;
-uint16_t DIMY=240;
 
 void effacer_ecran(uint16_t couleur){
 	ILI9341_Fill(couleur);
@@ -232,3 +227,4 @@ void collision_brique_boule(Boule *boule){
 		}
 	}
 }
+
