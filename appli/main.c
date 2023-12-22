@@ -79,8 +79,49 @@ int main(void)
 
 	initialisation_jeu(&plateforme, &boule);
 
+	matrix_keyboard_demo_process_main();
+	/*
+	init_boutons();
+	ajouter_bouton("Play again");
+	ajouter_bouton("Main menu");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("Game Over",&Font_11x18,0,DIMX),intervalle/2,"Game Over",&Font_11x18,ILI9341_COLOR_WHITE,ILI9341_COLOR_BLACK);
+	afficher_boutons();
+	*/
+
+	static void state_machine(void){
+		//static couleur_e state = INIT;
+	    switch(state){
+	    	case INIT:
+	    		ecran_titre();
+	    		if(KEYBOARD_get_key()=='5'){
+	    			state=MENU;
+	    		}
+	    	case MENU:
+	    		state=JEU;
+	    	case JEU:
+	    		initialisation_jeu(&plateforme, &boule);
+	    		while(1){
+	    			deroulement_jeu(&plateforme, &boule);
+	    		}
+	    	case WIN:
+	    		state=JEU;
+	    	case GAME_OVER:
+	    		state=JEU;
+	}
+
+
+
 	while(1)	//boucle de tâche de fond
 	{
+		/*
+		if(KEYBOARD_get_key()=='2'){
+			monter_bouton();
+		}
+		if(KEYBOARD_get_key()=='8'){
+			descendre_bouton();
+		}
+		*/
 		deroulement_jeu(&plateforme, &boule);
 	}
 }

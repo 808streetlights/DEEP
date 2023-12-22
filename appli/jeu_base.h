@@ -58,6 +58,7 @@ void determine_vitesse_y(Boule *boule);
 bool detecte_collision_plateforme(Plateforme plateforme, Boule boule);
 Point point_collision_plateforme(Plateforme plateforme, Boule boule);
 void collision_plateforme_boule(Plateforme plateforme, Boule *boule);
+
 void init_brique();
 void afficher_brique();
 bool detecte_collision_brique(Brique brique, Boule boule);

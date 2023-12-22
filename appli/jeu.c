@@ -29,7 +29,7 @@ void ecran_titre(){
 		plateformeH.largeur=6;
 		plateformeH.couleur=ILI9341_COLOR_WHITE;
 
-	ILI9341_Puts(centrer_x("Brick Breaker", &Font_16x26),centrer_y("Brick Breaker", &Font_16x26),"Brick Breaker", &Font_16x26, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+	ILI9341_Puts(centrer_x("Brick Breaker", &Font_16x26, 0, 320),centrer_y("Brick Breaker", &Font_16x26, 0, 240),"Brick Breaker", &Font_16x26, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
 
 	if(plateformeB.x-((plateformeB.longueur)/2)==0 && plateformeH.x+((plateformeH.longueur)/2)==320){
 		while(plateformeB.x+((plateformeB.longueur)/2)!=320 && plateformeH.x-((plateformeH.longueur)/2)!=0){

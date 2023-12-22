@@ -6,15 +6,10 @@
  */
 
 #include "tft_ili9341/stm32f1_ili9341.h"
+#include "gestion_affichage.h"
 #include "jeu_base.h"
 
-#define max(a, b) ((a > b) ? a : b)
-#define min(a, b) ((a < b) ? a : b)
-
 uint16_t BGC1=ILI9341_COLOR_BLACK;
-
-uint16_t DIMX=320;
-uint16_t DIMY=240;
 
 void effacer_ecran(uint16_t couleur){
 	ILI9341_Fill(couleur);
@@ -155,8 +150,6 @@ void collision_plateforme_boule(Plateforme plateforme, Boule *boule){
 
 Brique briques[nb_lignes][nb_colonnes];
 
-uint16_t longueur_cote=20;
-
 uint16_t choix_couleurs[]={ILI9341_COLOR_BLUE,ILI9341_COLOR_GREEN,ILI9341_COLOR_RED,ILI9341_COLOR_YELLOW};
 
 void init_brique(){
@@ -204,8 +197,8 @@ bool detecte_collision_brique(Brique brique, Boule boule){
 void effacer_brique(Brique brique){
 	uint16_t x0=brique.x;
 	uint16_t y0=brique.y;
-	uint16_t x1=brique.x+longueur_cote;
-	uint16_t y1=brique.y+longueur_cote;
+	uint16_t x1=brique.x+brique.cote;
+	uint16_t y1=brique.y+brique.cote;
 	ILI9341_DrawFilledRectangle(x0,y0,x1,y1,BGC1);
 }
 
@@ -218,7 +211,7 @@ void collision_brique_boule(Boule *boule){
 					briques[i][j].etat=false;
 					effacer_brique(briques[i][j]);
 					uint16_t x0=briques[i][j].x;
-					uint16_t x1=briques[i][j].x+longueur_cote;
+					uint16_t x1=briques[i][j].x+briques[i][j].cote;
 					if(boule->x<x0 || boule->x>x1){
 						rebond_boule_vertical(boule);
 						return;
@@ -232,3 +225,4 @@ void collision_brique_boule(Boule *boule){
 		}
 	}
 }
+
