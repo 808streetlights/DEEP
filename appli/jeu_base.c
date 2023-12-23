@@ -6,15 +6,10 @@
  */
 
 #include "tft_ili9341/stm32f1_ili9341.h"
+#include "gestion_affichage.h"
 #include "jeu_base.h"
 
-#define max(a, b) ((a > b) ? a : b)
-#define min(a, b) ((a < b) ? a : b)
-
 uint16_t BGC1=ILI9341_COLOR_BLACK;
-
-uint16_t DIMX=320;
-uint16_t DIMY=240;
 
 void effacer_ecran(uint16_t couleur){
 	ILI9341_Fill(couleur);
@@ -59,11 +54,17 @@ void deplacer_droite_plateforme(Plateforme *plateforme, uint16_t couleur){
     }
 }
 
+uint16_t vitesse_difficulte=4;
+
+void adapter_difficulte(uint16_t new_vitesse_difficulte){
+	vitesse_difficulte=new_vitesse_difficulte;
+}
+
 void init_boule(Boule *boule){
 	boule->x=DIMX/2;
 	boule->y=DIMY-60;
 	boule->r=4;
-	boule->vitesse=4;
+	boule->vitesse=vitesse_difficulte;
 	boule->vitesse_x=0;
 	boule->vitesse_y=1;
 	boule->couleur=ILI9341_COLOR_WHITE;
@@ -88,12 +89,6 @@ void deplacement_boule(Plateforme plateforme, Boule *boule, uint16_t couleur){
 	if(boule->y-boule->r+boule->vitesse_y<0){
 		boule->y=boule->r;
 		rebond_boule_horizontal(boule);
-	}
-	if(boule->y+boule->r+boule->vitesse_y>DIMY){
-		init_plateforme(&plateforme);
-		init_brique();
-		init_boule(boule);
-		afficher_brique();
 	}
 	collision_brique_boule(boule);
 	collision_plateforme_boule(plateforme,boule);
@@ -152,10 +147,10 @@ void collision_plateforme_boule(Plateforme plateforme, Boule *boule){
 
 #define nb_lignes 4
 #define nb_colonnes 14
+#define nb_briques nb_lignes*nb_colonnes
 
 Brique briques[nb_lignes][nb_colonnes];
-
-uint16_t longueur_cote=20;
+uint16_t nb_detruites;
 
 uint16_t choix_couleurs[]={ILI9341_COLOR_BLUE,ILI9341_COLOR_GREEN,ILI9341_COLOR_RED,ILI9341_COLOR_YELLOW};
 
@@ -169,6 +164,7 @@ void init_brique(){
 			briques[i][j].couleur=choix_couleurs[(i*nb_colonnes+j)%4];
 		}
 	}
+	nb_detruites=0;
 }
 
 void afficher_brique(){
@@ -204,8 +200,8 @@ bool detecte_collision_brique(Brique brique, Boule boule){
 void effacer_brique(Brique brique){
 	uint16_t x0=brique.x;
 	uint16_t y0=brique.y;
-	uint16_t x1=brique.x+longueur_cote;
-	uint16_t y1=brique.y+longueur_cote;
+	uint16_t x1=brique.x+brique.cote;
+	uint16_t y1=brique.y+brique.cote;
 	ILI9341_DrawFilledRectangle(x0,y0,x1,y1,BGC1);
 }
 
@@ -216,9 +212,10 @@ void collision_brique_boule(Boule *boule){
 				bool collision=detecte_collision_brique(briques[i][j],*boule);
 				if(collision==true){
 					briques[i][j].etat=false;
+					nb_detruites++;
 					effacer_brique(briques[i][j]);
 					uint16_t x0=briques[i][j].x;
-					uint16_t x1=briques[i][j].x+longueur_cote;
+					uint16_t x1=briques[i][j].x+briques[i][j].cote;
 					if(boule->x<x0 || boule->x>x1){
 						rebond_boule_vertical(boule);
 						return;
@@ -231,4 +228,12 @@ void collision_brique_boule(Boule *boule){
 			}
 		}
 	}
+}
+
+bool detecte_game_over(Boule boule){
+	return boule.y+boule.r+boule.vitesse_y>DIMY;
+}
+
+bool detecte_win(){
+	return nb_detruites==nb_briques;
 }
