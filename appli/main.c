@@ -77,10 +77,178 @@ int main(void)
 	Plateforme plateforme;
 	Boule boule;
 
-	initialisation_jeu(&plateforme, &boule);
+	//initialisation_jeu(&plateforme, &boule);
+
+	matrix_keyboard_demo_process_main();
+
+	void state_machine(void){
+
+		typedef enum{
+			INIT=0,
+			MENU,
+			JEU,
+			PAUSE,
+			DIFFICULTE,
+			GAME_OVER,
+			WIN,
+		}state_e;
+
+		static state_e state=INIT;
+
+	    switch(state){
+	    	case INIT:
+	    		ecran_titre();
+	    		if(KEYBOARD_get_key()=='5'){
+	    			state=MENU;
+	    			effacer_ecran(ILI9341_COLOR_BLACK);
+	    			break;
+	    		}
+	    		break;
+	    	case MENU:
+	    		main_menu:
+	    		initialisation_menu_principal();
+	    		while(1){
+	    			deplacements_menus();
+	    			if(KEYBOARD_get_key()=='5'){
+	    				if(getIndiceBoutonActif()==0){
+	    					state=JEU;
+	    					effacer_ecran(ILI9341_COLOR_BLACK);
+	    					break;
+	    				}
+	    				if(getIndiceBoutonActif()==1){
+	    					state=DIFFICULTE;
+	    					effacer_ecran(ILI9341_COLOR_BLACK);
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		break;
+	    	case JEU:
+	    		restart:
+	    		initialisation_jeu(&plateforme, &boule);
+	    		while(1){
+	    			resume:
+	    			deroulement_jeu(&plateforme, &boule);
+	    			if(KEYBOARD_get_key()=='1'){
+	    				effacer_ecran(ILI9341_COLOR_BLACK);
+	    				initialisation_pause();
+	    				while(1){
+	    					deplacements_menus();
+	    					if(KEYBOARD_get_key()=='5'){
+	    						if(getIndiceBoutonActif()==0){
+	    							effacer_ecran(ILI9341_COLOR_BLACK);
+	    							afficher_brique();
+	    							goto resume;
+	    						}
+								if(getIndiceBoutonActif()==1){
+									state=JEU;
+									effacer_ecran(ILI9341_COLOR_BLACK);
+									goto restart;
+								}
+								if(getIndiceBoutonActif()==2){
+	    							effacer_ecran(ILI9341_COLOR_BLACK);
+	    							goto main_menu;
+	    							break;
+	    						}
+	    					}
+	    				}
+	    			}
+	    			if(detecte_game_over(boule)){
+	    				state=GAME_OVER;
+	    				effacer_ecran(ILI9341_COLOR_BLACK);
+	    				break;
+	    			}
+	    			if(detecte_win()){
+	    				state=WIN;
+	    				effacer_ecran(ILI9341_COLOR_BLACK);
+	    				break;
+	    			}
+
+	    		}
+	    		break;
+	    	case DIFFICULTE:
+	    		initialisation_difficulte();
+	    		while(1){
+	    			deplacements_menus();
+	    			if(KEYBOARD_get_key()=='5'){
+						if(getIndiceBoutonActif()==0){
+							uint16_t new_vitesse_difficulte=3;
+							adapter_difficulte(new_vitesse_difficulte);
+							state=JEU;
+							effacer_ecran(ILI9341_COLOR_BLACK);
+							break;
+						}
+						if(getIndiceBoutonActif()==1){
+							uint16_t new_vitesse_difficulte=4;
+							adapter_difficulte(new_vitesse_difficulte);
+							state=JEU;
+							effacer_ecran(ILI9341_COLOR_BLACK);
+							break;
+						}
+						if(getIndiceBoutonActif()==2){
+							uint16_t new_vitesse_difficulte=5;
+							adapter_difficulte(new_vitesse_difficulte);
+							state=JEU;
+							effacer_ecran(ILI9341_COLOR_BLACK);
+							break;
+						}
+	    			}
+	    		}
+	    		break;
+	    	case GAME_OVER:
+	    		initialisation_game_over();
+	    		while(1){
+	    			deplacements_menus();
+	    			if(KEYBOARD_get_key()=='5'){
+	    				if(getIndiceBoutonActif()==0){
+	    				    state=JEU;
+	    				    effacer_ecran(ILI9341_COLOR_BLACK);
+	    				    break;
+	    				}
+	    				if(getIndiceBoutonActif()==1){
+	    					state=MENU;
+	    					effacer_ecran(ILI9341_COLOR_BLACK);
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		break;
+	    	case WIN:
+	    		initialisation_win();
+	    		while(1){
+	    			deplacements_menus();
+	    			if(KEYBOARD_get_key()=='5'){
+	    				if(getIndiceBoutonActif()==0){
+	    				    state=JEU;
+	    				    effacer_ecran(ILI9341_COLOR_BLACK);
+	    				    break;
+	    				}
+	    				if(getIndiceBoutonActif()==1){
+	    					state=MENU;
+	    					effacer_ecran(ILI9341_COLOR_BLACK);
+	    					break;
+	    				}
+	    			}
+	    		}
+	    		break;
+	    	default:
+	    		break;
+	    }
+	}
+
+
 
 	while(1)	//boucle de tâche de fond
 	{
-		deroulement_jeu(&plateforme, &boule);
+		state_machine();
+		/*
+		if(KEYBOARD_get_key()=='2'){
+			monter_bouton();
+		}
+		if(KEYBOARD_get_key()=='8'){
+			descendre_bouton();
+		}
+		*/
+		//deroulement_jeu(&plateforme, &boule);
 	}
 }

@@ -7,8 +7,12 @@
 
 #include "tft_ili9341/stm32f1_ili9341.h"
 #include "MatrixKeyboard/matrix_keyboard.h"
+#include "gestion_affichage.h"
 #include "jeu_base.h"
 #include "jeu.h"
+
+#define DIMX 320
+#define DIMY 240
 
 uint16_t BGC=ILI9341_COLOR_BLACK;
 
@@ -29,7 +33,7 @@ void ecran_titre(){
 		plateformeH.largeur=6;
 		plateformeH.couleur=ILI9341_COLOR_WHITE;
 
-	ILI9341_Puts(centrer_x("Brick Breaker", &Font_16x26),centrer_y("Brick Breaker", &Font_16x26),"Brick Breaker", &Font_16x26, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
+	ILI9341_Puts(centrer_x("Brick Breaker", &Font_16x26, 0, 320),centrer_y("Brick Breaker", &Font_16x26, 0, 240),"Brick Breaker", &Font_16x26, ILI9341_COLOR_WHITE, ILI9341_COLOR_BLACK);
 
 	if(plateformeB.x-((plateformeB.longueur)/2)==0 && plateformeH.x+((plateformeH.longueur)/2)==320){
 		while(plateformeB.x+((plateformeB.longueur)/2)!=320 && plateformeH.x-((plateformeH.longueur)/2)!=0){
@@ -47,6 +51,25 @@ void ecran_titre(){
 			afficher_plateforme(plateformeB);
 		}
 	}
+}
+
+void initialisation_menu_principal(){
+	init_boutons();
+	ajouter_bouton("Play");
+	ajouter_bouton("Difficulty");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("Brick Breaker",&Font_11x18,0,DIMX),intervalle/2,"Brick Breaker",&Font_11x18,ILI9341_COLOR_WHITE,BGC);
+	afficher_boutons();
+}
+
+void initialisation_difficulte(){
+	init_boutons();
+	ajouter_bouton("EASY");
+	ajouter_bouton("NORMAL");
+	ajouter_bouton("HARD");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("Difficulty",&Font_11x18,0,DIMX),intervalle/2,"Difficulty",&Font_11x18,ILI9341_COLOR_WHITE,BGC);
+	afficher_boutons();
 }
 
 void initialisation_jeu(Plateforme *plateforme, Boule *boule){
@@ -68,4 +91,41 @@ void deroulement_jeu(Plateforme *plateforme, Boule *boule){
 	deplacement_boule(*plateforme,boule,ILI9341_COLOR_BLACK);
 	afficher_boule(*boule);
 	HAL_Delay(10);
+}
+
+void initialisation_pause(){
+	init_boutons();
+	ajouter_bouton("Resume");
+	ajouter_bouton("Restart");
+	ajouter_bouton("Main menu");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("Pause",&Font_11x18,0,DIMX),intervalle/2,"Pause",&Font_11x18,ILI9341_COLOR_WHITE,ILI9341_COLOR_BLACK);
+	afficher_boutons();
+}
+
+void initialisation_game_over(){
+	init_boutons();
+	ajouter_bouton("Play again");
+	ajouter_bouton("Main menu");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("Game Over",&Font_11x18,0,DIMX),intervalle/2,"Game Over",&Font_11x18,ILI9341_COLOR_WHITE,ILI9341_COLOR_BLACK);
+	afficher_boutons();
+}
+
+void initialisation_win(){
+	init_boutons();
+	ajouter_bouton("Play again");
+	ajouter_bouton("Main menu");
+	uint16_t intervalle=DIMY/(1+(boutons.indiceSommet+1)+1);
+	ILI9341_Puts(centrer_x("You won! Congrats ;)",&Font_11x18,0,DIMX),intervalle/2,"You won! Congrats ;)",&Font_11x18,ILI9341_COLOR_WHITE,ILI9341_COLOR_BLACK);
+	afficher_boutons();
+}
+
+void deplacements_menus(){
+	if(KEYBOARD_get_key()=='2'){
+		monter_bouton();
+	}
+	if(KEYBOARD_get_key()=='8'){
+		descendre_bouton();
+	}
 }

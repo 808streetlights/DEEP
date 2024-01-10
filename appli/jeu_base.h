@@ -49,6 +49,7 @@ void init_plateforme(Plateforme *plateforme);
 void deplacer_gauche_plateforme(Plateforme *plateforme, uint16_t couleur);
 void deplacer_droite_plateforme(Plateforme *plateforme, uint16_t couleur);
 
+void adapter_difficulte(uint16_t new_vitesse_difficulte);
 void init_boule(Boule *boule);
 void afficher_boule(Boule boule);
 void deplacement_boule(Plateforme plateforme, Boule *boule, uint16_t couleur);
@@ -58,10 +59,14 @@ void determine_vitesse_y(Boule *boule);
 bool detecte_collision_plateforme(Plateforme plateforme, Boule boule);
 Point point_collision_plateforme(Plateforme plateforme, Boule boule);
 void collision_plateforme_boule(Plateforme plateforme, Boule *boule);
+
 void init_brique();
 void afficher_brique();
 bool detecte_collision_brique(Brique brique, Boule boule);
 void effacer_brique(Brique brique);
 void collision_brique_boule(Boule *boule);
+
+bool detecte_game_over(Boule boule);
+bool detecte_win();
 
 #endif /* JEU_BASE_H_ */
